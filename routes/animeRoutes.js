@@ -10,7 +10,7 @@ animeRouter
 animeRouter
   .route('/')
   .get(animeController.getAllAnimes)
-  .post(animeController.checkCreateAnime, animeController.createAnime);
+  .post(animeController.createAnime);
 animeRouter
   .route('/:id')
   .get(animeController.getAnime)

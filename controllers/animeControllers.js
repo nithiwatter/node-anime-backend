@@ -1,5 +1,6 @@
 const Anime = require('../models/animeModel');
 const APIFeatures = require('../utils/apifeatures');
+const AppError = require('../utils/appError');
 const slugify = require('slugify');
 
 exports.aliasTopAnimes = (req, res, next) => {
@@ -8,32 +9,29 @@ exports.aliasTopAnimes = (req, res, next) => {
 };
 
 exports.getAllAnimes = async (req, res) => {
-  try {
-    const features = new APIFeatures(Anime, req.query);
-    features.filter().sort().select().paginate();
-    let animes = features.query;
+  const features = new APIFeatures(Anime, req.query);
+  features.filter().sort().select().paginate();
+  let animes = features.query;
 
-    animes = await animes;
+  animes = await animes;
 
-    res.status(200).json({
-      status: 'success',
-      results: animes.length,
-      data: {
-        animes,
-      },
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
-  }
+  res.status(200).json({
+    status: 'success',
+    results: animes.length,
+    data: {
+      animes,
+    },
+  });
 };
 
-exports.getAnime = async (req, res) => {
+exports.getAnime = async (req, res, next) => {
   try {
     const anime = await Anime.findById(req.params.id);
+
+    if (!anime) {
+      return next(new AppError('No anime founded with this id', 404));
+    }
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -41,21 +39,8 @@ exports.getAnime = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
+    next(err);
   }
-};
-
-exports.checkCreateAnime = (req, res, next) => {
-  if (!req.body.name || !req.body.ratingsAverage) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'No name or ratings',
-    });
-  }
-  next();
 };
 
 exports.createAnime = async (req, res) => {
@@ -77,7 +62,7 @@ exports.createAnime = async (req, res) => {
   }
 };
 
-exports.updateAnime = async (req, res) => {
+exports.updateAnime = async (req, res, next) => {
   try {
     let update = { ...req.body };
 
@@ -89,6 +74,11 @@ exports.updateAnime = async (req, res) => {
       new: true,
       runValidators: true,
     });
+
+    if (!anime) {
+      return next(new AppError('No anime founded with this id', 404));
+    }
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -96,16 +86,18 @@ exports.updateAnime = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
+    next(err);
   }
 };
 
-exports.deleteAnime = async (req, res) => {
+exports.deleteAnime = async (req, res, next) => {
   try {
     const anime = await Anime.findByIdAndDelete(req.params.id);
+
+    if (!anime) {
+      return next(new AppError('No anime founded with this id', 404));
+    }
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -113,14 +105,11 @@ exports.deleteAnime = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
+    next(err);
   }
 };
 
-exports.getAnimeStats = async (req, res) => {
+exports.getAnimeStats = async (req, res, next) => {
   try {
     const overallStats = await Anime.aggregate([
       {
@@ -157,9 +146,6 @@ exports.getAnimeStats = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
+    next(err);
   }
 };

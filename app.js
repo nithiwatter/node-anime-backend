@@ -1,6 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 const animeRouter = require('./routes/animeRoutes');
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorControllers');
 
 const app = express();
 
@@ -10,11 +12,9 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json());
 
 app.use('/api/animes', animeRouter);
-app.all('*', (req, res) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Cannot find ${req.originalUrl} on this server...`,
-  });
+app.all('*', (req, res, next) => {
+  next(new AppError(`Cannot find ${req.originalUrl} on this server...`, 404));
 });
+app.use(globalErrorHandler);
 
 module.exports = app;
