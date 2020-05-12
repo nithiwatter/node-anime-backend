@@ -1,5 +1,6 @@
 const Anime = require('../models/animeModel');
 const APIFeatures = require('../utils/apifeatures');
+const slugify = require('slugify');
 
 exports.aliasTopAnimes = (req, res, next) => {
   req.query = { sort: '-ratingsAverage,name', limit: 3 };
@@ -78,8 +79,13 @@ exports.createAnime = async (req, res) => {
 
 exports.updateAnime = async (req, res) => {
   try {
-    console.log(req.body.synopsis);
-    const anime = await Anime.findByIdAndUpdate(req.params.id, req.body, {
+    let update = { ...req.body };
+
+    if (req.body.name) {
+      update.slug = slugify(req.body.name, { lower: true });
+    }
+
+    const anime = await Anime.findByIdAndUpdate(req.params.id, update, {
       new: true,
       runValidators: true,
     });
