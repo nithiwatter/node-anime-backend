@@ -18,7 +18,18 @@ const handleValidationError = (err, sentError) => {
   }: ${validationMessages.join('. ')}`;
 };
 
+const handleJWTError = (err, sentError) => {
+  err.statusCode = 401;
+  sentError.message = 'Invalid token. Please log in again!';
+};
+
+const handleJWTExpiredError = (err, sentError) => {
+  err.statusCode = 401;
+  sentError.message = 'Your token has expired. Please log in again!';
+};
+
 module.exports = (err, req, res, next) => {
+  //console.log(err);
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
@@ -30,6 +41,7 @@ module.exports = (err, req, res, next) => {
   if (err.name === 'CastError') handleCastError(err, sentError);
   if (err.code === 11000) handleDuplicatedFieldsError(err, sentError);
   if (err.name === 'ValidationError') handleValidationError(err, sentError);
-
+  if (err.name === 'JsonWebTokenError') handleJWTError(err, sentError);
+  if (err.name === 'TokenExpiredError') handleJWTExpiredError(err, sentError);
   res.status(err.statusCode).json(sentError);
 };

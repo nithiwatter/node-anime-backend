@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const signToken = (id) => {
+  console.log(process.env.JWT_EXPIRES_IN);
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
@@ -60,6 +61,51 @@ exports.login = async (req, res, next) => {
       status: 'success',
       token,
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.protect = async (req, res, next) => {
+  try {
+    let token = '';
+    // Get the token and check if it is there (by checking headers)
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      token = req.headers.authorization.split(' ')[1];
+    } else {
+      return next(
+        new AppError('You are not logged in! Please log in to get access', 401)
+      );
+    }
+    console.log(token);
+
+    // Validate the sent token (any modification to the sent token results in failure)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded);
+
+    // Check if user still exists
+    const user = await User.findById(decoded.id);
+    console.log(user);
+    if (!user)
+      return next(
+        new AppError('The user belonging to this token no longer exists!', 401)
+      );
+    // Check if user changed password after the token was issued
+    if (user.changedPasswordAfter(decoded.iat)) {
+      return next(
+        new AppError(
+          'User recently changed password. Please log in again!',
+          401
+        )
+      );
+    }
+
+    //All pass, so grant access to protected route
+    req.user = user;
+    next();
   } catch (err) {
     next(err);
   }

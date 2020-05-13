@@ -1,5 +1,6 @@
 const express = require('express');
 const animeController = require('../controllers/animeControllers');
+const authController = require('../controllers/authControllers');
 
 const animeRouter = express.Router();
 
@@ -14,7 +15,7 @@ animeRouter
 animeRouter
   .route('/:id')
   .get(animeController.getAnime)
-  .patch(animeController.updateAnime)
-  .delete(animeController.deleteAnime);
+  .patch(authController.protect, animeController.updateAnime)
+  .delete(authController.protect, animeController.deleteAnime);
 
 module.exports = animeRouter;

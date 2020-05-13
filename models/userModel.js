@@ -30,15 +30,18 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same',
     },
   },
+  passwordChangedAt: {
+    type: Date,
+  },
 });
 
 userSchema.pre('save', async function (next) {
   // validation runs before pre hook - so passwords being equal would have already been checked
   // for update, ensure that only if password has been modified would this get executed
   if (!this.isModified('password')) return next();
-  console.log(this.password);
+
   this.password = await bcrypt.hash(this.password, 10);
-  console.log(this.password);
+
   this.passwordConfirm = undefined;
   next();
 });
@@ -48,6 +51,16 @@ userSchema.methods.correctPassword = async function (
   correctHashedPassword
 ) {
   return await bcrypt.compare(candidatePassword, correctHashedPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  // Some users may have never changed their passwords
+  if (this.passwordChangedAt) {
+    const changedTimestamp = this.passwordChangedAt.getTime() / 1000;
+    console.log(changedTimestamp, JWTTimestamp);
+    return JWTTimestamp < changedTimestamp;
+  }
+  return false;
 };
 
 const User = mongoose.model('User', userSchema);
