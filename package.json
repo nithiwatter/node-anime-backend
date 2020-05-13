@@ -10,7 +10,8 @@
     "morgan": "^1.10.0",
     "nodeenv": "^3.0.0",
     "nodemon": "^2.0.3",
-    "slugify": "^1.4.0"
+    "slugify": "^1.4.0",
+    "validator": "^13.0.0"
   },
   "devDependencies": {},
   "scripts": {

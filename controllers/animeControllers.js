@@ -43,7 +43,7 @@ exports.getAnime = async (req, res, next) => {
   }
 };
 
-exports.createAnime = async (req, res) => {
+exports.createAnime = async (req, res, next) => {
   try {
     const newAnime = new Anime(req.body);
     await newAnime.save();
@@ -54,11 +54,7 @@ exports.createAnime = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err);
-    res.status(400).json({
-      status: 'fail',
-      message: 'Invalid data sent!',
-    });
+    next(err);
   }
 };
 
