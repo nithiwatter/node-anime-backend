@@ -16,6 +16,10 @@ animeRouter
   .route('/:id')
   .get(animeController.getAnime)
   .patch(authController.protect, animeController.updateAnime)
-  .delete(authController.protect, animeController.deleteAnime);
+  .delete(
+    authController.protect,
+    authController.restrictTo('moderator'),
+    animeController.deleteAnime
+  );
 
 module.exports = animeRouter;

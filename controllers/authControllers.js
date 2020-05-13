@@ -18,6 +18,7 @@ exports.signup = async (req, res, next) => {
       email: req.body.email,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
+      role: req.body.role,
     });
     await newUser.save();
 
@@ -80,15 +81,12 @@ exports.protect = async (req, res, next) => {
         new AppError('You are not logged in! Please log in to get access', 401)
       );
     }
-    console.log(token);
 
     // Validate the sent token (any modification to the sent token results in failure)
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
 
     // Check if user still exists
     const user = await User.findById(decoded.id);
-    console.log(user);
     if (!user)
       return next(
         new AppError('The user belonging to this token no longer exists!', 401)
@@ -110,3 +108,36 @@ exports.protect = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.restrictTo = (role) => {
+  return (req, res, next) => {
+    if (req.user.role != role) {
+      return next(
+        new AppError('You not have permission to perform this action', 403)
+      );
+    }
+    next();
+  };
+};
+
+exports.forgotPassword = async (req, res, next) => {
+  try {
+    // Get user based on posted email
+    const user = await User.findOne({ email: req.body.email });
+    if (!user)
+      return next(new AppError('There is no user with this email', 404));
+
+    // Create an unhashed reset token and save the hashed one to DB
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+      status: 'success',
+      resetToken,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.resetPassword = (req, res, next) => {};
