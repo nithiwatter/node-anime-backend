@@ -47,6 +47,7 @@ exports.createAnime = async (req, res, next) => {
   try {
     const newAnime = new Anime(req.body);
     await newAnime.save();
+
     res.status(201).json({
       status: 'success',
       data: {
