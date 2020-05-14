@@ -121,6 +121,7 @@ exports.restrictTo = (role) => {
   };
 };
 
+// for non logged in user who forgot the password
 exports.forgotPassword = async (req, res, next) => {
   try {
     // Get user based on posted email
@@ -165,13 +166,12 @@ exports.resetPassword = async (req, res, next) => {
       .createHash('sha256')
       .update(req.params.token)
       .digest('hex');
-    console.log(123);
+
     const user = await User.findOne({
       passwordResetToken: hashedToken,
       passwordResetExpires: { $gt: Date.now() },
     });
-    console.log(user);
-    console.log(hashedToken);
+
     // If token has not expired, and there is a user, set the new password
     if (!user)
       return next(new AppError('Token is invalid or has expired', 400));
@@ -180,6 +180,36 @@ exports.resetPassword = async (req, res, next) => {
     user.passwordConfirm = req.body.passwordConfirm;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
+    await user.save();
+
+    // Log the user in by sending JWT token
+    const token = signToken(user._id);
+
+    res.status(200).json({
+      status: 'success',
+      token,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// for logged in user to update his password
+exports.updatePassword = async (req, res, next) => {
+  try {
+    // Get user from collection (will always get one since it has already passed the protect middleware)
+    const user = await User.findById(req.user._id).select('+password');
+
+    // Check if the posted current password is the correct one
+    const correct = await user.correctPassword(
+      req.body.password,
+      user.password
+    );
+    if (!correct) return next(new AppError('Incorrect email or password', 400));
+
+    // Update the new password
+    user.password = req.body.newPassword;
+    user.passwordConfirm = req.body.newPasswordConfirm;
     await user.save();
 
     // Log the user in by sending JWT token
