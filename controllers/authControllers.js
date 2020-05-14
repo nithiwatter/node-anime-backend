@@ -1,7 +1,8 @@
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
-const bcrypt = require('bcryptjs');
+const sendEmail = require('../utils/email');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const signToken = (id) => {
   console.log(process.env.JWT_EXPIRES_IN);
@@ -131,13 +132,64 @@ exports.forgotPassword = async (req, res, next) => {
     const resetToken = user.createPasswordResetToken();
     await user.save({ validateBeforeSave: false });
 
+    // Send the token to the user's email
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/users/resetPassword/${resetToken}`;
+
+    const message = `Forgot your password? Submit a patch request with your new password and passwordConfirm to: ${resetURL}`;
+
+    await sendEmail({
+      email: user.email,
+      subject: 'Your password reset token',
+      message,
+    });
+
     res.status(200).json({
       status: 'success',
+      message: 'Token sent to email!',
       resetToken,
+    });
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+    next(err);
+  }
+};
+
+exports.resetPassword = async (req, res, next) => {
+  try {
+    // Get user based on the unhashed token
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(req.params.token)
+      .digest('hex');
+    console.log(123);
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+    console.log(user);
+    console.log(hashedToken);
+    // If token has not expired, and there is a user, set the new password
+    if (!user)
+      return next(new AppError('Token is invalid or has expired', 400));
+
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    // Log the user in by sending JWT token
+    const token = signToken(user._id);
+
+    res.status(200).json({
+      status: 'success',
+      token,
     });
   } catch (err) {
     next(err);
   }
 };
-
-exports.resetPassword = (req, res, next) => {};

@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
   },
   passwordResetToken: String,
-  passwordResetExpire: Date,
+  passwordResetExpires: Date,
 });
 
 userSchema.pre('save', async function (next) {
@@ -54,6 +54,14 @@ userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
 
   this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  // To prevent the JWT token being issued before passwordChangedAt
+  this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
@@ -83,8 +91,8 @@ userSchema.methods.createPasswordResetToken = function () {
     .digest('hex');
 
   // Have 10 minutes to reset the password
-  this.passwordResetExpire = Date.now() + 10 * 60 * 1000;
-  console.log(resetToken, this.passwordResetToken);
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
   return resetToken;
 };
 
