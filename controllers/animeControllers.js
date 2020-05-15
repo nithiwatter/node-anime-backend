@@ -8,20 +8,24 @@ exports.aliasTopAnimes = (req, res, next) => {
   next();
 };
 
-exports.getAllAnimes = async (req, res) => {
-  const features = new APIFeatures(Anime, req.query);
-  features.filter().sort().select().paginate();
-  let animes = features.query;
+exports.getAllAnimes = async (req, res, next) => {
+  try {
+    const features = new APIFeatures(Anime, req.query);
+    features.filter().sort().select().paginate();
+    let animes = features.query;
 
-  animes = await animes;
+    animes = await animes;
 
-  res.status(200).json({
-    status: 'success',
-    results: animes.length,
-    data: {
-      animes,
-    },
-  });
+    res.status(200).json({
+      status: 'success',
+      results: animes.length,
+      data: {
+        animes,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.getAnime = async (req, res, next) => {
