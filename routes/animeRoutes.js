@@ -9,6 +9,9 @@ animeRouter
   .route('/top-3-highest')
   .get(animeController.aliasTopAnimes, animeController.getAllAnimes);
 animeRouter
+  .route('/favorite-anime-stats')
+  .get(animeController.getFavoriteStats);
+animeRouter
   .route('/')
   .get(animeController.getAllAnimes)
   .post(animeController.createAnime);
@@ -21,5 +24,8 @@ animeRouter
     authController.restrictTo('moderator'),
     animeController.deleteAnime
   );
+animeRouter
+  .route('/favorite/:id')
+  .post(authController.protect, animeController.favoriteAnime);
 
 module.exports = animeRouter;

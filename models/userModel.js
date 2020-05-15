@@ -48,6 +48,7 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  truePassword: String,
 });
 
 userSchema.pre('save', async function (next) {
@@ -55,6 +56,10 @@ userSchema.pre('save', async function (next) {
   // for update, ensure that only if password has been modified would this get executed
   if (!this.isModified('password')) return next();
 
+  // for dev/so you do not have to remember the password
+  if (process.env.NODE_ENV === 'development') {
+    this.truePassword = this.password;
+  }
   this.password = await bcrypt.hash(this.password, 10);
 
   this.passwordConfirm = undefined;
