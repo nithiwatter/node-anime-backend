@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const animeRouter = require('./routes/animeRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorControllers');
 
@@ -45,6 +46,7 @@ app.use(
 
 app.use('/api/animes', animeRouter);
 app.use('/api/users', userRouter);
+app.use('/api/reviews', reviewRouter);
 app.all('*', (req, res, next) => {
   next(new AppError(`Cannot find ${req.originalUrl} on this server...`, 404));
 });

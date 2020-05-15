@@ -203,6 +203,7 @@ exports.getFavoriteStats = async (req, res, next) => {
           'user.truePassword': 0,
           'user.passwordChangedAt': 0,
           'user.role': 0,
+          'user.__v': 0,
         },
       },
       {
@@ -224,7 +225,14 @@ exports.getFavoriteStats = async (req, res, next) => {
       },
       { $unwind: '$anime' },
       { $sort: { 'anime.ratingsAverage': -1 } },
-      { $project: { _id: 0 } },
+      {
+        $project: {
+          _id: 0,
+          'anime.__v': 0,
+          'anime.slug': 0,
+          'anime.createdAt': 0,
+        },
+      },
     ]);
 
     res.status(200).json({
