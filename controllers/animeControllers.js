@@ -163,7 +163,10 @@ exports.favoriteAnime = async (req, res, next) => {
     }
 
     if (
-      await Favorite.find({ userId: req.body.userId, animeId: req.params.id })
+      await Favorite.findOne({
+        userId: req.body.userId,
+        animeId: req.params.id,
+      })
     ) {
       return next(new AppError('You have already favorited this anime', 400));
     }
@@ -186,43 +189,47 @@ exports.getFavoriteStats = async (req, res, next) => {
   try {
     const favoriteStats = await Favorite.aggregate([
       {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      { $unwind: '$user' },
+      {
+        $project: {
+          'user.password': 0,
+          'user.truePassword': 0,
+          'user.passwordChangedAt': 0,
+          'user.role': 0,
+        },
+      },
+      {
         $group: {
           _id: '$animeId',
           count: { $sum: 1 },
-          users: { $push: '$userId' },
+          users: {
+            $push: '$user',
+          },
         },
       },
+      {
+        $lookup: {
+          from: 'animes',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'anime',
+        },
+      },
+      { $unwind: '$anime' },
+      { $sort: { 'anime.ratingsAverage': -1 } },
+      { $project: { _id: 0 } },
     ]);
-    let formattedResult = [];
-    for (dex in favoriteStats) {
-      formattedResult.push(Anime.findById(favoriteStats[dex]._id));
-      formattedResult.push(
-        User.find({ _id: favoriteStats[dex].users }).select({
-          name: 1,
-          email: 1,
-          status: 1,
-          role: 1,
-        })
-      );
-    }
-
-    formattedResult = await Promise.all(formattedResult);
-    let finalResult = [];
-
-    for (dex = 0; dex < formattedResult.length; dex += 2) {
-      const anime = {
-        anime: formattedResult[dex],
-        users: formattedResult[dex + 1],
-        count: formattedResult[dex + 1].length,
-      };
-      finalResult.push(anime);
-    }
-
-    finalResult = _.sortBy(finalResult, (el) => -el.anime.ratingsAverage);
 
     res.status(200).json({
       status: 'success',
-      finalResult,
+      favoriteStats,
     });
   } catch (err) {
     next(err);
