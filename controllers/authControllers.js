@@ -5,9 +5,27 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 const signToken = (id) => {
-  console.log(process.env.JWT_EXPIRES_IN);
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+const sendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.cookie('jwt', token, {
+    expires: new Date(
+      Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  });
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
   });
 };
 
@@ -24,15 +42,7 @@ exports.signup = async (req, res, next) => {
     await newUser.save();
 
     // automatically log in the user by sending JWT
-    const token = signToken(newUser._id);
-
-    res.status(201).json({
-      status: 'success',
-      token,
-      data: {
-        user: newUser,
-      },
-    });
+    sendToken(newUser, 201, res);
   } catch (err) {
     next(err);
   }
@@ -41,7 +51,6 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    console.log(email);
 
     // Check if email and password exist in the req.body
     if (!email || !password) {
@@ -57,12 +66,7 @@ exports.login = async (req, res, next) => {
     if (!correct) return next(new AppError('Incorrect email or password', 400));
 
     // Send JWT token for logging in
-    const token = signToken(user._id);
-
-    res.status(200).json({
-      status: 'success',
-      token,
-    });
+    sendToken(user, 200, res);
   } catch (err) {
     next(err);
   }
@@ -183,12 +187,7 @@ exports.resetPassword = async (req, res, next) => {
     await user.save();
 
     // Log the user in by sending JWT token
-    const token = signToken(user._id);
-
-    res.status(200).json({
-      status: 'success',
-      token,
-    });
+    sendToken(user, 200, res);
   } catch (err) {
     next(err);
   }
@@ -213,12 +212,7 @@ exports.updatePassword = async (req, res, next) => {
     await user.save();
 
     // Log the user in by sending JWT token
-    const token = signToken(user._id);
-
-    res.status(200).json({
-      status: 'success',
-      token,
-    });
+    sendToken(user, 200, res);
   } catch (err) {
     next(err);
   }
