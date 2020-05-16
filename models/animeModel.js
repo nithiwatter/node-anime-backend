@@ -33,8 +33,7 @@ const animeSchema = new mongoose.Schema(
     },
     synopsis: {
       type: String,
-      default: 'Just an anime.',
-      required: true,
+      default: 'No synopsis.',
       trim: true,
     },
     image_url: String,

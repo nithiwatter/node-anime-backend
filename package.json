@@ -30,7 +30,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
     "start:prod": "set NODE_ENV=production&&nodemon server.js",
-    "scrape": "node ./utils/importMAL.js"
+    "scrape": "node ./utils/importMAL.js",
+    "db": "node ./utils/saveToDB.js"
   },
   "repository": {
     "type": "git",

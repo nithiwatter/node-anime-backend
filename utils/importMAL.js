@@ -14,6 +14,7 @@ const getTop50 = async () => {
     finalData.push(res);
   }
   console.log(finalData);
+  //fs.writeFileSync('importedData.json', JSON.stringify(finalData));
 };
 
 const createJSONFromAnime = async (animeUrl) => {
@@ -31,14 +32,13 @@ const createJSONFromAnime = async (animeUrl) => {
     strLength = animeInfo.aired.string.length;
     res.year = parseInt(animeInfo.aired.string.slice(strLength - 4, strLength));
     res.image_url = `./images/${res.mal_id}.jpg`;
+    //await downloadImageFromAnime(animeInfo.image_url, res.mal_id, res.name);
     return new Promise((resolve, reject) => {
       setTimeout(() => resolve(res), 2000);
     });
   } catch (err) {
     console.log(`Error downloading ${animeUrl}`);
   }
-
-  //   fs.writeFileSync('importedData.json', JSON.stringify(res));
 };
 
 const downloadImageFromAnime = async (imageUrl, mal_id, name) => {
@@ -51,8 +51,9 @@ const downloadImageFromAnime = async (imageUrl, mal_id, name) => {
     responseType: 'stream',
   });
   animeImage.data.pipe(writer);
-  return localUrl;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => resolve(localUrl), 1000);
+  });
 };
 
 getTop50();
-//createJSONFromAnime('https://api.jikan.moe/v3/anime/5114');
