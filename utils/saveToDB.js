@@ -17,7 +17,7 @@ data = JSON.parse(data);
 
 const deleteAllAnimes = async () => {
   try {
-    await Anime.deleteMany({});
+    await Anime.deleteMany({ rank: { $gt: 50 } });
   } catch (err) {
     console.log(err);
   }
@@ -31,7 +31,10 @@ const importAllAnimes = async () => {
         console.log(data[i].name);
         data[i].synopsis = 'No synopsis.';
       }
-      data[i].rank = i + 1;
+      if (data[i].episodes === null) {
+        data[i].episodes = 13;
+      }
+      data[i].rank = i + 51;
       const newAnime = new Anime(data[i]);
       await newAnime.save();
     }

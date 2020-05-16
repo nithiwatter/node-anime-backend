@@ -3,7 +3,7 @@ const fs = require('fs');
 const slugify = require('slugify');
 
 const getTop50 = async () => {
-  const top50 = await axios.get('https://api.jikan.moe/v3/top/anime/1');
+  const top50 = await axios.get('https://api.jikan.moe/v3/top/anime/2');
   const finalData = [];
   for (dex in top50.data.top) {
     console.log(dex);
@@ -14,7 +14,7 @@ const getTop50 = async () => {
     finalData.push(res);
   }
   console.log(finalData);
-  //fs.writeFileSync('importedData.json', JSON.stringify(finalData));
+  fs.writeFileSync('importedData.json', JSON.stringify(finalData));
 };
 
 const createJSONFromAnime = async (animeUrl) => {
@@ -32,7 +32,7 @@ const createJSONFromAnime = async (animeUrl) => {
     strLength = animeInfo.aired.string.length;
     res.year = parseInt(animeInfo.aired.string.slice(strLength - 4, strLength));
     res.image_url = `./images/${res.mal_id}.jpg`;
-    //await downloadImageFromAnime(animeInfo.image_url, res.mal_id, res.name);
+    await downloadImageFromAnime(animeInfo.image_url, res.mal_id, res.name);
     return new Promise((resolve, reject) => {
       setTimeout(() => resolve(res), 2000);
     });
