@@ -5,7 +5,6 @@ const reviewController = require('../controllers/reviewControllers');
 const reviewRouter = express.Router();
 reviewRouter
   .route('/')
-  .get(authController.protect, reviewController.getAllReviews)
-  .post(authController.protect, reviewController.createReview);
+  .get(authController.protect, reviewController.getAllReviews);
 
 module.exports = reviewRouter;

@@ -1,4 +1,5 @@
 const Review = require('../models/reviewModel');
+const AppError = require('../utils/appError');
 
 exports.getAllReviews = async (req, res, next) => {
   try {
@@ -18,6 +19,16 @@ exports.getAllReviews = async (req, res, next) => {
 
 exports.createReview = async (req, res, next) => {
   try {
+    if (
+      await Review.findOne({
+        animeId: req.params.animeId,
+        userId: req.user._id,
+      })
+    ) {
+      return next(
+        new AppError('You have already written a review for this anime', 400)
+      );
+    }
     const newReview = await Review.create({
       animeId: req.params.animeId,
       userId: req.user._id,

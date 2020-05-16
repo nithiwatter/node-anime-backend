@@ -59,7 +59,7 @@ animeSchema.virtual('reviews', {
   ref: 'Review', // model I am referencing
   localField: '_id',
   foreignField: 'animeId',
-  options: { select: '-__v -_id -createdAt' },
+  options: { select: '-__v -createdAt' },
 });
 
 animeSchema.set('toObject', { virtuals: true });

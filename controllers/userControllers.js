@@ -1,6 +1,21 @@
 const AppError = require('../utils/appError');
 const User = require('../models/userModel');
 
+exports.getMe = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).select('+password');
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        user,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.updateMe = async (req, res, next) => {
   try {
     // Create error if user posts password data
@@ -15,7 +30,9 @@ exports.updateMe = async (req, res, next) => {
 
     res.status(200).json({
       status: 'success',
-      user: updatedUser,
+      data: {
+        user: updatedUser,
+      },
     });
   } catch (err) {
     next(err);

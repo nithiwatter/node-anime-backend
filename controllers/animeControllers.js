@@ -1,8 +1,8 @@
 const Anime = require('../models/animeModel');
-const User = require('../models/userModel');
 const Favorite = require('../models/favoriteModel');
 const APIFeatures = require('../utils/apifeatures');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 const slugify = require('slugify');
 const _ = require('underscore');
 
@@ -101,11 +101,9 @@ exports.deleteAnime = async (req, res, next) => {
       return next(new AppError('No anime founded with this id', 404));
     }
 
-    res.status(200).json({
+    res.status(204).json({
       status: 'success',
-      data: {
-        anime,
-      },
+      data: null,
     });
   } catch (err) {
     next(err);

@@ -13,6 +13,7 @@ userRouter.patch(
   authController.protect,
   authController.updatePassword
 );
+userRouter.get('/getMe', authController.protect, userController.getMe);
 userRouter.patch('/updateMe', authController.protect, userController.updateMe);
 userRouter.patch(
   '/deactivateMe',
