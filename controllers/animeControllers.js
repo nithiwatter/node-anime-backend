@@ -137,6 +137,7 @@ exports.getAnimeStats = async (req, res, next) => {
         $addFields: { year: '$_id' },
       },
       { $project: { _id: 0 } },
+      { $sort: { year: -1 } },
     ]);
 
     res.status(200).json({
