@@ -33,8 +33,7 @@ exports.getAllAnimes = async (req, res, next) => {
 
 exports.getAnime = async (req, res, next) => {
   try {
-    const anime = await Anime.findById(req.params.id);
-
+    const anime = await Anime.findById(req.params.id).populate('reviews');
     if (!anime) {
       return next(new AppError('No anime founded with this id', 404));
     }
@@ -156,7 +155,7 @@ exports.getAnimeStats = async (req, res, next) => {
 
 exports.favoriteAnime = async (req, res, next) => {
   try {
-    if (!req.body.userId || !req.params.id) {
+    if (!req.user || !req.params.id) {
       return next(
         new AppError('Missing user or anime. Please resend the request', 400)
       );
@@ -164,7 +163,7 @@ exports.favoriteAnime = async (req, res, next) => {
 
     if (
       await Favorite.findOne({
-        userId: req.body.userId,
+        userId: req.user._id,
         animeId: req.params.id,
       })
     ) {

@@ -18,7 +18,12 @@ exports.getAllReviews = async (req, res, next) => {
 
 exports.createReview = async (req, res, next) => {
   try {
-    const newReview = await Review.create(req.body);
+    const newReview = await Review.create({
+      animeId: req.params.animeId,
+      userId: req.user._id,
+      review: req.body.review,
+      rating: req.body.rating,
+    });
 
     res.status(201).json({
       status: 'success',
@@ -26,5 +31,7 @@ exports.createReview = async (req, res, next) => {
         review: newReview,
       },
     });
-  } catch (err) {}
+  } catch (err) {
+    next(err);
+  }
 };

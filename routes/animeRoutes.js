@@ -1,6 +1,7 @@
 const express = require('express');
 const animeController = require('../controllers/animeControllers');
 const authController = require('../controllers/authControllers');
+const reviewController = require('../controllers/reviewControllers');
 
 const animeRouter = express.Router();
 
@@ -27,5 +28,7 @@ animeRouter
 animeRouter
   .route('/favorite/:id')
   .post(authController.protect, animeController.favoriteAnime);
-
+animeRouter
+  .route('/:animeId/reviews')
+  .post(authController.protect, reviewController.createReview);
 module.exports = animeRouter;
