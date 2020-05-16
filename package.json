@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
@@ -28,7 +29,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
-    "start:prod": "set NODE_ENV=production&&nodemon server.js"
+    "start:prod": "set NODE_ENV=production&&nodemon server.js",
+    "scrape": "node ./utils/importMAL.js"
   },
   "repository": {
     "type": "git",

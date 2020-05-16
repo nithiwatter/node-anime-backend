@@ -37,13 +37,17 @@ const animeSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    images: [String],
+    image_url: String,
     createdAt: {
       type: Date,
       default: Date.now(),
     },
     slug: {
       type: String,
+    },
+    mal_id: {
+      type: Number,
+      required: true,
     },
   },
   { id: false }
