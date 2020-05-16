@@ -7,10 +7,8 @@ class App extends Component {
   state = {};
 
   async componentDidMount() {
-    const res = await axios.get('/api/animes/5ebffe1711e9fc463cad5647');
+    const res = await axios.get('/api/animes');
     console.log(res.data);
-    console.log(123);
-    console.log(555);
   }
 
   render() {

@@ -42,5 +42,11 @@
   "bugs": {
     "url": "https://github.com/nithiwatter/node-anime-backend/issues"
   },
-  "homepage": "https://github.com/nithiwatter/node-anime-backend#readme"
+  "homepage": "https://github.com/nithiwatter/node-anime-backend#readme",
+  "nodemonConfig": {
+    "ignore": [
+      "client/*"
+    ],
+    "delay": "2500"
+  }
 }
