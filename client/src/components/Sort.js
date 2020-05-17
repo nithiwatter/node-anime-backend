@@ -53,7 +53,12 @@ class Sort extends Component {
     return (
       <div>
         <Paper className={classes.paper}>
-          <Grid className={classes.root} container spacing={1}>
+          <Grid
+            style={{ width: '100vw' }}
+            className={classes.root}
+            container
+            spacing={1}
+          >
             <Grid item xs={3} className={classes.sortBox}>
               <Checkbox
                 checked={ratings}

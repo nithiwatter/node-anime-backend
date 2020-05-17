@@ -11,35 +11,11 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 
-const data = {
-  anime: {
-    episodes: 25,
-    studio: 'J.C.Staff',
-    synopsis:
-      "Onto their third serialization, manga duo Moritaka Mashiro and Akito Takagi—also known by their pen name, Muto Ashirogi—are ever closer to their dream of an anime adaption. However, the real challenge is only just beginning: if they are unable to compete with the artist Eiji Niizuma in the rankings within the span of six months, they will be canceled. To top it off, numerous rivals are close behind and declaring war. They don't even have enough time to spare thinking about an anime! In Bakuman. 3rd Season, Muto Ashirogi must find a way to stay atop the colossal mountain known as the Shounen Jack rankings. With new problems and new assistants, the pair continue to strive for their dream. [Written by MAL Rewrite]",
-    createdAt: '2020-05-16T14:52:07.839Z',
-    _id: '5ebffe1711e9fc463cad5647',
-    name: 'Bakuman. 3rd Season',
-    rank: 61,
-    ratingsAverage: 8.62,
-    mal_id: 12365,
-    year: 2013,
-    image_url: './images/12365.jpg',
-    slug: 'bakuman.-3rd-season',
-    __v: 0,
-    reviews: [],
-  },
-};
-
 const styles = (theme) => ({
-  animeCard: {
-    position: 'relative',
-    border: '1px solid red',
-    margin: theme.spacing(2),
-    height: '350px',
-  },
   root: {
     position: 'relative',
+    border: '1px solid red',
+    width: '20px',
   },
 
   actionArea: {
@@ -68,8 +44,12 @@ const styles = (theme) => ({
     display: 'flex',
     width: '100%',
     height: '25%',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    padding: 0,
+    border: '1px solid blue',
+    paddingLeft: theme.spacing(2),
+    paddingTop: theme.spacing(1),
   },
   text: {
     color: 'white',
@@ -94,33 +74,51 @@ const styles = (theme) => ({
 
 class AnimeCard extends Component {
   render() {
-    const { classes } = this.props;
+    const { classes, data } = this.props;
+    console.log(data);
     return (
       <Card className={classes.root}>
+        <Fab size="small" className={classes.rank} color="secondary">
+          <Typography variant="h6">{data.rank}</Typography>
+        </Fab>
         <CardActionArea className={classes.actionArea}>
-          <Fab
-            size="small"
-            className={classes.rank}
-            color="secondary"
-            aria-label="add"
-          >
-            <Typography variant="h6">1</Typography>
-          </Fab>
           <CardMedia
             className={classes.image}
             component="img"
             alt="Contemplative Reptile"
             height="300"
-            image="./918.jpg"
+            image={data.image_url}
             title="Contemplative Reptile"
           />
           <div className={classes.textBG}></div>
           <CardContent className={classes.textBox}>
-            <Typography className={classes.text} variant="h4" component="h1">
-              Gintama
+            {/* <Typography className={classes.text} variant="h6" component="h1">
+              {data.name}
+            </Typography> */}
+
+            <Typography
+              noWrap
+              style={{
+                height: 'auto',
+                width: '90%',
+                // border: '1px solid red',
+              }}
+              className={classes.text}
+              variant="subtitle1"
+            >
+              {data.name}
             </Typography>
-            <Typography className={classes.text} variant="h5" component="h2">
-              9.12
+
+            <Typography
+              style={
+                {
+                  // border: '1px solid red',
+                }
+              }
+              className={classes.text}
+              variant="h5"
+            >
+              {data.ratingsAverage}
             </Typography>
           </CardContent>
         </CardActionArea>
