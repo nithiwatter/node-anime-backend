@@ -10,20 +10,18 @@ class animeGallery extends Component {
       sort: {
         ratings: true,
         ratingsDesc: true,
+        year: false,
+        yearDesc: true,
+        studio: false,
+        studioDesc: true,
+        episodes: false,
+        episodesDesc: true,
       },
     };
     this.handleSort = this.handleSort.bind(this);
-    this.handleJ = this.handleJ.bind(this);
-  }
-
-  handleJ() {
-    console.log(1);
-    this.setState({});
   }
 
   handleSort(sortParameter) {
-    console.log(sortParameter);
-
     this.setState((prevState) => {
       const newSort = {
         sort: {
@@ -40,11 +38,7 @@ class animeGallery extends Component {
     return (
       <Fragment>
         <Header></Header>
-        <Sort
-          sort={this.state.sort}
-          handleSort={this.handleSort}
-          handleJ={this.handleJ}
-        ></Sort>
+        <Sort sort={this.state.sort} handleSort={this.handleSort}></Sort>
       </Fragment>
     );
   }
