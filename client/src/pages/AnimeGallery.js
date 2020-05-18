@@ -1,9 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import Header from '../components/Header';
 import Sort from '../components/Sort';
-import Grid from '@material-ui/core/Grid';
+import axios from 'axios';
 import AnimeCard from '../components/AnimeCard';
 import { withStyles } from '@material-ui/core/styles';
+import MainGrid from '../components/MainGrid';
 
 let data = {
   animes: [
@@ -167,7 +168,7 @@ class animeGallery extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [1, 2, 3],
+      animes: [],
       sort: {
         ratings: true,
         ratingsDesc: true,
@@ -180,6 +181,13 @@ class animeGallery extends Component {
       },
     };
     this.handleSort = this.handleSort.bind(this);
+  }
+
+  async componentDidMount() {
+    let animes = await axios.get('api/animes?limit=50&sort=-ratingsAverage');
+    animes = animes.data.data.animes;
+    console.log(animes);
+    this.setState({ animes });
   }
 
   handleSort(sortParameter) {
@@ -198,21 +206,8 @@ class animeGallery extends Component {
     console.log(this.state);
     const { classes } = this.props;
     return (
-      <div style={{ overflowX: 'hidden' }}>
-        <Header></Header>
-        <Sort sort={this.state.sort} handleSort={this.handleSort}></Sort>
-        <Grid
-          style={{ width: '100%' }}
-          className={classes.main}
-          container
-          spacing={1}
-        >
-          {data.map((anime) => (
-            <Grid item xs={2} key={anime._id}>
-              <AnimeCard data={anime}></AnimeCard>
-            </Grid>
-          ))}
-        </Grid>
+      <div>
+        <MainGrid animes={this.state.animes}></MainGrid>
       </div>
     );
   }

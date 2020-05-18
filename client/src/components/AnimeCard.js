@@ -4,134 +4,131 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
+import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import Fab from '@material-ui/core/Fab';
 import EditIcon from '@material-ui/icons/Edit';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 const styles = (theme) => ({
   root: {
-    position: 'relative',
-    border: '1px solid red',
-    width: '20px',
+    width: '100%',
   },
-
   actionArea: {
-    margin: 0,
-    padding: 0,
     height: '300px',
     position: 'relative',
   },
   image: {
     position: 'absolute',
     top: 0,
-  },
-  textBG: {
-    position: 'absolute',
+    left: 0,
     width: '100%',
-    height: '25%',
-    backgroundColor: 'black',
-    opacity: '70%',
-    zIndex: 1,
-    bottom: 0,
+    height: '100%',
   },
-  textBox: {
+  textArea: {
     position: 'absolute',
-    zIndex: 1,
-    bottom: 0,
-    display: 'flex',
-    width: '100%',
-    height: '25%',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    padding: 0,
-    border: '1px solid blue',
-    paddingLeft: theme.spacing(2),
-    paddingTop: theme.spacing(1),
-  },
-  text: {
+    bottom: '5%',
+    left: '5%',
+    width: '90%',
+    height: '20%',
     color: 'white',
-    opacity: '100%',
-    margin: 0,
+    zIndex: 2,
+  },
+
+  learnMore: {
+    marginLeft: 'auto',
   },
   rank: {
     position: 'absolute',
-    zIndex: 1,
     top: 0,
     right: 0,
     margin: theme.spacing(1),
+    zIndex: 2,
   },
-  buttons: {
-    boxShadow: 'none',
-    marginLeft: 0,
-  },
-  bottom: {
-    display: 'flex',
+  backdrop: {
+    width: '100%',
+    height: '30%',
+    backgroundColor: 'black',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    zIndex: 1,
+    margin: 0,
+    opacity: '50%',
   },
 });
 
 class AnimeCard extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { expanded: false };
+    this.handleExpandClick = this.handleExpandClick.bind(this);
+  }
+
+  handleExpandClick() {
+    this.setState({ expanded: !this.state.expanded });
+  }
+
   render() {
     const { classes, data } = this.props;
-    console.log(data);
+
     return (
       <Card className={classes.root}>
-        <Fab size="small" className={classes.rank} color="secondary">
-          <Typography variant="h6">{data.rank}</Typography>
-        </Fab>
         <CardActionArea className={classes.actionArea}>
+          <Avatar className={classes.rank}>{data.rank}</Avatar>
           <CardMedia
             className={classes.image}
             component="img"
-            alt="Contemplative Reptile"
-            height="300"
             image={data.image_url}
-            title="Contemplative Reptile"
           />
-          <div className={classes.textBG}></div>
-          <CardContent className={classes.textBox}>
-            {/* <Typography className={classes.text} variant="h6" component="h1">
-              {data.name}
-            </Typography> */}
-
-            <Typography
-              noWrap
-              style={{
-                height: 'auto',
-                width: '90%',
-                // border: '1px solid red',
-              }}
-              className={classes.text}
-              variant="subtitle1"
-            >
-              {data.name}
-            </Typography>
-
-            <Typography
-              style={
-                {
-                  // border: '1px solid red',
-                }
-              }
-              className={classes.text}
-              variant="h5"
-            >
-              {data.ratingsAverage}
-            </Typography>
+          <CardContent>
+            <div className={classes.backdrop}></div>
+            <div className={classes.textArea}>
+              <Typography
+                noWrap
+                variant="h6"
+                align="left"
+                style={{ width: '100%' }}
+              >
+                {data.name}
+              </Typography>
+              <Grid
+                container
+                spacing={0}
+                justify="space-between"
+                style={{ marginTop: '4px' }}
+              >
+                <Typography variant="body1" align="left">
+                  {data.ratingsAverage}
+                </Typography>
+                <Typography variant="body1" align="right">
+                  {data.studio}
+                </Typography>
+              </Grid>
+            </div>
           </CardContent>
         </CardActionArea>
-        <CardActions className={classes.bottom}>
-          <Button style={{ flexGrow: 1 }} size="small" color="primary">
+        <CardActions
+          disableSpacing
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            height: '60px',
+          }}
+        >
+          <IconButton>
+            <FavoriteIcon></FavoriteIcon>
+          </IconButton>
+          <IconButton>
+            <EditIcon></EditIcon>
+          </IconButton>
+          <Button className={classes.learnMore} size="small">
             Learn More
           </Button>
-          <Fab className={classes.buttons} size="small" color="primary">
-            <FavoriteIcon />
-          </Fab>
-          <Fab className={classes.buttons} size="small" color="primary">
-            <EditIcon />
-          </Fab>
         </CardActions>
       </Card>
     );
